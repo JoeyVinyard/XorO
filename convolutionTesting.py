@@ -15,6 +15,7 @@ def getPointForConv(x,y,map):
 	elif y<0:
 		return 0
 	else:
+		# print("Returning: ",map[y][x])
 		return map[y][x]
 
 def convolute(x,y,filter, map):
@@ -28,6 +29,16 @@ def convolute(x,y,filter, map):
 	total/=len(filter)
 	return round(total,2)
 
+def poolPoint(x,y,map):
+	# print("pooling for: ",x,y,[getPointForConv(x,y,map),getPointForConv(x,y+1,map),getPointForConv(x+1,y,map),getPointForConv(x+1,y+1,map)])
+	return max([getPointForConv(x,y,map),getPointForConv(x,y+1,map),getPointForConv(x+1,y,map),getPointForConv(x+1,y+1,map)])
+
+def poolMap(map):
+	pooledMap = [[0]*math.ceil(len(map)/2) for n in range(math.ceil(len(map)/2))]
+	for y, row in enumerate(pooledMap):
+		for x, value in enumerate(row):
+			pooledMap[y][x] = poolPoint(2*x,2*y,map)
+	return pooledMap
 
 img = Image.open("x.png").convert("L")
 
@@ -67,3 +78,8 @@ for d in numberMap:
 print("----------------------")
 for c in convoluted:
 	print(c)
+
+numberMap = poolMap(convoluted)
+
+for row in numberMap:
+		print(row)

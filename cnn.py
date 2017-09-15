@@ -1,21 +1,26 @@
 from PIL import Image
+import random
 import math
+
+def genFilter(n):
+	f = []
+	for i in range(n*n):
+		f.append(round(random.uniform(-1,1),2))
+	return f
 
 def handleNum(value):
 	return -(round(value/127.5,2)-1)
 
 def getPointForConv(x,y,map):
-	# print("Returning value at:",x,y)
-	if x>=width:
+	if x>=len(map[0]):
 		return 0
 	elif x<0:
 		return 0
-	elif y>=height:
+	elif y>=len(map):
 		return 0
 	elif y<0:
 		return 0
 	else:
-		# print("Returning: ",map[y][x])
 		return map[y][x]
 
 def convolute(x,y,filter, map):
@@ -30,7 +35,6 @@ def convolute(x,y,filter, map):
 	return round(total,2)
 
 def poolPoint(x,y,map):
-	# print("pooling for: ",x,y,[getPointForConv(x,y,map),getPointForConv(x,y+1,map),getPointForConv(x+1,y,map),getPointForConv(x+1,y+1,map)])
 	return max([getPointForConv(x,y,map),getPointForConv(x,y+1,map),getPointForConv(x+1,y,map),getPointForConv(x+1,y+1,map)])
 
 def poolMap(map):
@@ -61,25 +65,28 @@ fltr = 	[1,-1,-1,
 		-1,1,-1,
 		-1,-1,1] #3x3 grid
 
-xC, yC = 0,0
-convoluted = [[0]*height for n in range(width)]
+while len(numberMap)>1:
+	xC, yC = 0,0
+	convoluted = [[0]*len(numberMap) for n in range(len(numberMap[0]))]
+	for n in numberMap:
+		xC=0
+		for a in n:
+			convoluted[yC][xC] = (convolute(xC,yC,fltr,numberMap))
+			xC+=1
+		yC+=1
 
-convolute(0,0,fltr,numberMap)
+	print("Convoluted")
+	for d in convoluted:
+		print(d)
 
-for n in numberMap:
-	xC=0
-	for a in n:
-		convoluted[yC][xC] = (convolute(xC,yC,fltr,numberMap))
-		xC+=1
-	yC+=1
+	numberMap = poolMap(convoluted)
+	print("Pooled:")
+	for d in numberMap:
+			print(d)
+
+	print("-------------------------")
 
 for d in numberMap:
-	print(d)
-print("----------------------")
-for c in convoluted:
-	print(c)
+		print(d)
 
-numberMap = poolMap(convoluted)
-
-for row in numberMap:
-		print(row)
+print(genFilter(5))
